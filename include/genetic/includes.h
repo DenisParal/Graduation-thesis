@@ -1,0 +1,10 @@
+#pragma once
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <ctime>
+#include <cmath>
+#include <type_traits>
+#include <memory>
+#include "Genetic.h"
+#include "utils.h"
