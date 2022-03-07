@@ -200,15 +200,15 @@ std::size_t optimum(const Container& cont, const Predicate& func){
     return index;
 }
 
-template<typename Container>
-std::vector<int> order_code(const Container& start_order){
+template<typename Container, typename T = unsigned int>
+std::vector<T> order_code(const Container& start_order){
     std::size_t size=start_order.size();
-    std::vector<int> base(size);
+    std::vector<T> base(size);
     for(std::size_t i=0;i<size;i++){
         base[i]=start_order.at(i);
     }
     std::sort(base.begin(),base.end());
-    std::vector<int> result(size);
+    std::vector<T> result(size);
     for(std::size_t i=0;i<size;i++){
         int pos=std::find(base.begin(),base.end(),start_order.at(i))-base.begin();
         result[i]=pos;
@@ -217,15 +217,15 @@ std::vector<int> order_code(const Container& start_order){
     return result;
 }
 
-template<typename Container>
-std::vector<int> order_decode(const Container& point_pool, const std::vector<int>& order){
+template<typename T, typename Container>
+std::vector<T> order_decode(const Container& point_pool, const std::vector<T>& order){
     std::size_t size=point_pool.size();
-    std::vector<int> base(size);
+    std::vector<T> base(size);
     for(std::size_t i=0;i<size;i++){
         base[i]=point_pool.at(i);
     }
     std::sort(base.begin(),base.end());
-    std::vector<int> result(size);
+    std::vector<T> result(size);
     for(std::size_t i=0;i<size;i++){
         int pos=order[i];
         result[i]=base[pos];

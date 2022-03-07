@@ -11,7 +11,7 @@ public:
 template<typename T, typename Adapt_func>
 class npoint_crossover : public crossover<T,Adapt_func>{
 public:
-    npoint_crossover(std::vector<int>& positions):positions(positions){}
+    npoint_crossover(std::vector<unsigned int>& positions):positions(positions){}
     std::vector<std::shared_ptr<individual<T>>> operator()(const std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<T>>>& parents, const Adapt_func& func, std::size_t offspring_size=2){
     std::vector<std::shared_ptr<individual<T>>> offspring;
     std::size_t size=parents.first->size();
@@ -36,7 +36,7 @@ public:
     offspring.push_back(std::make_shared<individual<T>>(sgenotype,func));
     return offspring;
 }
-std::vector<int> positions;
+std::vector<unsigned int> positions;
 };
 
 template<typename T, typename Adapt_func>
@@ -68,8 +68,8 @@ template<typename T, typename Adapt_func>
 class classic_crossover : public crossover<T,Adapt_func>{
 public:
     std::vector<std::shared_ptr<individual<T>>> operator()(const std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<T>>>& parents, const Adapt_func& func, std::size_t offspring_size=2){
-    std::vector<int> first_parent_order=order_code(*(parents.first));
-    std::vector<int> second_parent_order=order_code(*(parents.second));
+    std::vector<unsigned int> first_parent_order=order_code(*(parents.first));
+    std::vector<unsigned int> second_parent_order=order_code(*(parents.second));
     std::vector<std::shared_ptr<individual<T>>> offspring;
     std::size_t size=parents.first->size();
     std::vector<std::vector<T>> genotypes(offspring_size,std::vector<T>(size));
@@ -94,10 +94,10 @@ public:
 template<typename T, typename Adapt_func>
 class npoint_ordered_crossover : public crossover<T,Adapt_func>{
 public:
-    npoint_ordered_crossover(std::vector<int>& positions):positions(positions){}
+    npoint_ordered_crossover(std::vector<unsigned int>& positions):positions(positions){}
     std::vector<std::shared_ptr<individual<T>>> operator()(const std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<T>>>& parents, const Adapt_func& func, std::size_t offspring_size=2){
-        std::vector<int> first_parent_order=order_code(*(parents.first));
-        std::vector<int> second_parent_order=order_code(*(parents.second));
+        std::vector<unsigned int> first_parent_order=order_code(*(parents.first));
+        std::vector<unsigned int> second_parent_order=order_code(*(parents.second));
         std::vector<std::shared_ptr<individual<T>>> offspring;
         std::size_t size=first_parent_order.size();
         std::size_t index=0;
@@ -121,6 +121,6 @@ public:
         offspring.push_back(std::make_shared<individual<T>>(order_decode(*(parents.second),sgenotype),func));
         return offspring;
     }
-    std::vector<int> positions;
+    std::vector<unsigned int> positions;
 };
 

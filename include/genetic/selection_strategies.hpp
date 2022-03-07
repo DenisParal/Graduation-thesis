@@ -33,35 +33,51 @@ std::vector<std::shared_ptr<individual<T>>> operator()(std::vector<std::shared_p
     bool selector=false;
     while(old_gen_size>0 || new_gen_size>0){
         if(selector && old_gen_size>0 ||new_gen_size==0){
-            if(sum_old_adapt_value>0){
-                chance=rand()%sum_old_adapt_value;
-            }else{
-                chance=rand();
+            if(sum_old_adapt_value == 0)
+            {
+                chance = rand()%old_gen.size();
+                result_gen.push_back(old_gen[chance]);
+                old_gen.erase(old_gen.begin()+chance);
+                --old_gen_size;
+                selector=false;
             }
-            for(int i=0;i<old_gen.size();i++){
-                if(func(chance,old_gen[i]->adapt())){
-                    sum_old_adapt_value-=old_gen[i]->adapt();
-                    result_gen.push_back(old_gen[i]);
-                    old_gen.erase(old_gen.begin()+i);
-                    --old_gen_size;
-                    selector=false;
-                    break;
+            else
+            {
+                chance=rand()%sum_old_adapt_value;
+                for(int i=0;i<old_gen.size();i++){
+                    if(func(chance,old_gen[i]->adapt())){
+                        sum_old_adapt_value-=old_gen[i]->adapt();
+                        result_gen.push_back(old_gen[i]);
+                        old_gen.erase(old_gen.begin()+i);
+                        --old_gen_size;
+                        selector=false;
+                        break;
+                    }
                 }
             }
-        }else{
-            if(sum_new_adapt_value>0){
-                chance=rand()%sum_new_adapt_value;
-            }else{
-                chance=rand();
+        }
+        else
+        {
+            if(sum_new_adapt_value == 0)
+            {
+                chance = rand()%new_gen.size();
+                result_gen.push_back(new_gen[chance]);
+                new_gen.erase(new_gen.begin()+chance);
+                --new_gen_size;
+                selector=false;
             }
-            for(int i=0;i<new_gen.size();i++){
-                if(func(chance,new_gen[i]->adapt())){
-                    sum_new_adapt_value-=new_gen[i]->adapt();
-                    result_gen.push_back(new_gen[i]);
-                    new_gen.erase(new_gen.begin()+i);
-                    --new_gen_size;
-                    selector=true;
-                    break;
+            else
+            {
+                chance=rand()%sum_new_adapt_value;
+                for(int i=0;i<new_gen.size();i++){
+                    if(func(chance,new_gen[i]->adapt())){
+                        sum_new_adapt_value-=new_gen[i]->adapt();
+                        result_gen.push_back(new_gen[i]);
+                        new_gen.erase(new_gen.begin()+i);
+                        --new_gen_size;
+                        selector=true;
+                        break;
+                    }
                 }
             }
         }

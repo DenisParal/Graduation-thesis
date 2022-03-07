@@ -37,8 +37,8 @@ class ordered_inbreeding_reproductive_strategy : public reproductive_strategy<T>
 public:
 ordered_inbreeding_reproductive_strategy(std::size_t distance):distance(distance){}
 std::vector<std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<T>>>> operator()(std::vector<std::shared_ptr<individual<T>>> population){
-    std::vector<int> first_parent_order;
-    std::vector<int> second_parent_order;
+    std::vector<unsigned int> first_parent_order;
+    std::vector<unsigned int> second_parent_order;
     
     std::size_t size=population.size();
     std::vector<std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<T>>>> result;
@@ -99,7 +99,6 @@ template<typename T>
 class positive_assotiative_reproductive_sterategy : public reproductive_strategy<T>{
 public:
 std::vector<std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<T>>>> operator()(std::vector<std::shared_ptr<individual<T>>> population){
-    std::size_t size=population.size();
     long sum_adapt_value=0;
     for(auto x: population){
         sum_adapt_value+= x->adapt();
@@ -108,42 +107,35 @@ std::vector<std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<
     std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<T>>> candidate;
     std::size_t pos1,pos2;
     long double chance;
+    std::shared_ptr<individual<T>>* candidate_pair = new std::shared_ptr<individual<T>>[2];
     while(population.size()>1){
-        if(sum_adapt_value>0){
-            chance=rand()%sum_adapt_value;
-        }else{
-            chance=rand();
-        }
-        for(int i=0;i<population.size();i++){
-            if(chance<=population[i]->adapt()){
-                candidate.first=population[i];
-                population.erase(population.begin()+i);
-                sum_adapt_value-=candidate.first->adapt();
-                --size;
-                break;
-            }else{
-                chance-=population[i]->adapt();
+        for(unsigned int j = 0; j < 2; ++j)
+        {
+            if(sum_adapt_value == 0)
+            {
+            chance = rand()%population.size();
+            candidate_pair[j]=population[chance];
+            population.erase(population.begin()+chance);
+            }
+            else
+            {
+                chance=rand()%sum_adapt_value;
+                for(int i=0;i<population.size();i++){
+                    if(chance<=population[i]->adapt()){
+                        candidate_pair[j]=population[i];
+                        population.erase(population.begin()+i);
+                        sum_adapt_value-=candidate_pair[j]->adapt();
+                        break;
+                    }else{
+                        chance-=population[i]->adapt();
+                    }
+                }
+                chance=0;
             }
         }
-        if(sum_adapt_value>0){
-            chance=rand()%sum_adapt_value;
-        }else{
-            chance=rand();
-        }
-        for(int i=0;i<population.size();i++){
-            if(chance<=population[i]->adapt()){
-                candidate.second=population[i];
-                population.erase(population.begin()+i);
-                sum_adapt_value-=candidate.second->adapt();
-                --size;
-                result.push_back(candidate);
-                candidate.first=std::shared_ptr<individual<T>>();
-                candidate.second=std::shared_ptr<individual<T>>();
-                break;
-            }else{
-                chance-=population[i]->adapt();
-            }
-        }
+        candidate.first=candidate_pair[0];
+        candidate.second=candidate_pair[1];
+        result.push_back(candidate);
     }
     return result;
 }
@@ -163,40 +155,47 @@ std::vector<std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<
     std::size_t pos1,pos2;
     long double chance;
     while(population.size()>1){
-        if(sum_adapt_value>0){
+        if(sum_adapt_value == 0)
+        {
+            chance = rand()%population.size();
+            candidate.first=population[chance];
+            population.erase(population.begin()+chance);
+        }
+        else
+        {
             chance=rand()%sum_adapt_value;
-        }else{
-            chance=rand();
-        }
-        for(int i=0;i<population.size();i++){
-            if(chance<=population[i]->adapt()){
-                candidate.first=population[i];
-                population.erase(population.begin()+i);
-                sum_adapt_value-=candidate.first->adapt();
-                --size;
-                break;
-            }else{
-                chance-=population[i]->adapt();
+            for(int i=0;i<population.size();i++){
+                if(chance<=population[i]->adapt()){
+                    candidate.first=population[i];
+                    population.erase(population.begin()+i);
+                    sum_adapt_value-=candidate.first->adapt();
+                    break;
+                }else{
+                    chance-=population[i]->adapt();
+                }
             }
+            chance=0;
         }
-        if(sum_adapt_value>0){
+        if(sum_adapt_value == 0)
+        {
+            chance = rand()%population.size();
+            candidate.first=population[chance];
+            population.erase(population.begin()+chance);
+        }
+        else
+        {
             chance=rand()%sum_adapt_value;
-        }else{
-            chance=rand();
-        }
-        for(int i=0;i<population.size();i++){
-            if(1.0/chance<=1.0/(population[i]->adapt())){
-                candidate.second=population[i];
-                population.erase(population.begin()+i);
-                sum_adapt_value-=candidate.second->adapt();
-                --size;
-                result.push_back(candidate);
-                candidate.first=std::shared_ptr<individual<T>>();
-                candidate.second=std::shared_ptr<individual<T>>();
-                break;
-            }else{
-                chance-=population[i]->adapt();
+            for(int i=0;i<population.size();i++){
+                if(1.0/chance<=1.0/(double)(population[i]->adapt())){
+                    candidate.first=population[i];
+                    population.erase(population.begin()+i);
+                    sum_adapt_value-=candidate.first->adapt();
+                    break;
+                }else{
+                    chance-=population[i]->adapt();
+                }
             }
+            chance=0;
         }
     }
     return result;

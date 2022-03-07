@@ -22,7 +22,7 @@ std::shared_ptr<individual<T>> operator()(const std::vector<std::shared_ptr<indi
     do{
         parents=(*reprod_f)(current_generation);
         for(auto& pair:parents){
-        auto offspring=(*cross_f)(pair,func);
+            auto offspring=(*cross_f)(pair,func);
             for(auto& individ:offspring){
                 mutation_roll=rand()%101;
                 if(mutation_roll<=mutation_chance){

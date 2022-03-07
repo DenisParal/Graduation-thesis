@@ -108,7 +108,7 @@ bool operator()(const std::vector<std::shared_ptr<individual<T>>>& population, c
     for(auto& individ: population){
         average_adapt+= individ->adapt();
     }
-    std::cout <<"\nCOND_LOG: current average: "<<average_adapt<<" last average: "<<last_average_adapt<<"\n\n";
+    // std::cout <<"\nCOND_LOG: current average: "<<average_adapt<<" last average: "<<last_average_adapt<<"\n\n";
     if(last_average_adapt==-1){
         last_average_adapt=average_adapt;
         return true;

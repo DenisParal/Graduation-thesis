@@ -14,7 +14,7 @@ std::vector<unsigned int> get_completion_times(const std::vector<unsigned int>& 
     std::vector<unsigned int> completion_times(start_times.size());
     for(unsigned int i = 0; i < start_times.size(); ++i)
     {
-        completion_times[i]=start_times[i] + tasks[i].task_time;
+        completion_times[i] = start_times[i] + tasks[i].task_time;
     }
     return completion_times;
 }
@@ -22,10 +22,11 @@ std::vector<unsigned int> get_completion_times(const std::vector<unsigned int>& 
 std::vector<unsigned int> get_start_times(const std::vector<task>& tasks, const std::vector<unsigned int> order)
 {
     std::vector<unsigned int> start_times(order.size());
-    start_times[order[0]] = 0;
-    for(unsigned int i = 1; i < order.size(); ++i)
+    unsigned int current_time = 0;
+    for(unsigned int i = 0; i < order.size(); ++i)
     {
-        start_times[order[i]] = start_times[i-1] + tasks[order[i-1]].task_time;
+        start_times[order[i]] = current_time;
+        current_time += tasks[order[i]].task_time; //Should I add 1 to current time to start next job?
     }
     return start_times;
 }
@@ -33,9 +34,24 @@ std::vector<unsigned int> get_start_times(const std::vector<task>& tasks, const 
 unsigned int get_penalty(const std::vector<task>& tasks, const std::vector<unsigned int> completion_times)
 {
     unsigned int penalty = 0;
-    for(unsigned int i = 1; i < completion_times.size(); ++i)
+    for(unsigned int i = 0; i < completion_times.size(); ++i)
     {
         penalty = completion_times[i] > tasks[i].direct_time ? penalty + (completion_times[i] - tasks[i].direct_time) * tasks[i].penalty : penalty;
     }
     return penalty;
 }
+
+class penalty_calculator
+{
+private:
+    std::vector<task> tasks;
+public:
+    penalty_calculator(const std::vector<task> tasks) : tasks(tasks) {}
+    template<typename T>
+    unsigned int operator()(const std::vector<T>& order) const
+    {
+        auto start_times = get_start_times(tasks, order);
+        auto completion_times = get_completion_times(start_times, tasks);
+        return get_penalty(tasks, completion_times);
+    }
+};
