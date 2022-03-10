@@ -40,25 +40,25 @@ std::shared_ptr<individual<T>> operator()(const std::vector<std::shared_ptr<indi
             }
         }
 
-        
-        std::cout <<"\tGeneration number: "<<generation<<"\n";
-        std::cout <<"Best individ: ";
+        // log("\tGeneration number: ", generation, "\n";
+        log("\tGeneration number: ", generation, "\n");
+        log("Best individ: ");
         print_key(*best_individ);
-        std::cout <<" ("<<best_individ->adapt()<<")\n";
-        std::cout <<"Population:\n";
+        log(" (", best_individ->adapt(), ")\n");
+        log("Population:\n");
         for(std::size_t i=0;i<current_generation.size();i++){
-            std::cout <<i+1<<") ";
+            log(i+1, ") ");
             print_key(*(current_generation[i]));
-            std::cout <<" ("<<current_generation[i]->adapt()<<")\n";
+            log(" (", current_generation[i]->adapt(), ")\n");
         }
 
         next_generation.clear();
     }while((*e_cond)(current_generation, best_individ));
 
-    std::cout <<"\n\n\tFinal result: ";
+    log("\n\n\tFinal result: ");
     print_key(*best_individ);
-    std::cout <<" ("<<best_individ->adapt()<<")\n";
-    std::cout <<"Generation: "<<generation<<"\n";
+    log(" (", best_individ->adapt(), ")\n");
+    log("Generation: ", generation, "\n");
     return best_individ;
 }
 

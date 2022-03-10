@@ -64,6 +64,7 @@ public:
 }
 };
 
+//todo: take a look at this algo, seems like it's incorrect
 template<typename T, typename Adapt_func>
 class classic_crossover : public crossover<T,Adapt_func>{
 public:

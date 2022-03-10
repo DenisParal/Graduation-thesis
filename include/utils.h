@@ -2,8 +2,27 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <fstream>
 #include "Genetic.h"
 
+
+bool enable_log = false;
+
+template<typename... T>
+void log(T... message)
+{
+
+}
+
+template<typename T, typename... Other>
+void log(T&& message, Other... other)
+{
+    if(enable_log)
+    {
+        std::cout << message;
+        log(other...);
+    }
+}
 
 template<typename Iterator>
 void reverse(Iterator& begin, Iterator& end) {
@@ -58,23 +77,23 @@ int get_distance(const Key_type& first_key, const Key_type& second_key) {
 
 template<typename Key_type>
 void print_key(const Key_type& key){
-    std::cout <<"[";
+    log("[");
     for(auto& x: key){
-        std::cout <<x <<" ";
+        log(x ," ");
     }
-    std::cout <<"]";
+    log("]");
 }
 template<typename Key_type, typename T>
 void print_pair(const std::pair<Key_type, T>& pair) {
     print_key(*(pair.first));
-    std::cout << " (" << pair.second << ")";
+    log(" (", pair.second, ")");
 }
 
 template<typename Key_type, typename T>
 void print_algo_result(const std::pair<Key_type, T>& result){
-    std::cout << "*****Algorithm result: pair<";
+    log("*****Algorithm result: pair<");
     print_pair(result);
-    std::cout << ">*****\n";
+    log(">*****\n");
 }
 
 template<typename Container, typename Key_type>
@@ -217,6 +236,7 @@ std::vector<T> order_code(const Container& start_order){
     return result;
 }
 
+//todo: take a look at this algo, seems like it's incorrect
 template<typename T, typename Container>
 std::vector<T> order_decode(const Container& point_pool, const std::vector<T>& order){
     std::size_t size=point_pool.size();
@@ -236,3 +256,37 @@ std::vector<T> order_decode(const Container& point_pool, const std::vector<T>& o
 
 template<typename T>
 void print_type(T&);
+
+
+std::vector<std::vector<std::vector<unsigned int>>> load_tasks(std::ifstream& fin, unsigned int data_size)
+{
+    unsigned int task_time;
+    unsigned int penalty;
+    unsigned int directive;
+
+    std::vector<std::vector<std::vector<unsigned int>>> tasks_data;
+    while(!fin.eof())
+    {
+        tasks_data.push_back(std::vector<std::vector<unsigned int>>());
+        tasks_data.back().push_back(std::vector<unsigned int>());
+        for(std::size_t i = 0; i < data_size; ++i)
+        {
+            fin >> task_time;
+            tasks_data.back().back().push_back(task_time);
+        }
+        tasks_data.back().push_back(std::vector<unsigned int>());
+        for(std::size_t i = 0; i < data_size; ++i)
+        {
+            fin >> penalty;
+            tasks_data.back().back().push_back(penalty);
+        }
+        tasks_data.back().push_back(std::vector<unsigned int>());
+        for(std::size_t i = 0; i < data_size; ++i)
+        {
+            fin >> directive;
+            tasks_data.back().back().push_back(directive);
+        }
+    }
+    fin.close();
+    return tasks_data;
+}

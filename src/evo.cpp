@@ -5,34 +5,13 @@
 std::ifstream fin;
 std::ofstream fout;
 
-template<typename Adapt_func>
-std::vector<std::shared_ptr<individual<unsigned int>>> generate_random_population(std::size_t individ_size, std::size_t pop_size,const Adapt_func& func){
-    std::vector<std::shared_ptr<individual<unsigned int>>> result;
-    std::vector<unsigned int> base;
-    std::vector<unsigned int> order(individ_size);
-    int pos;
-    for(std::size_t i=0;i<pop_size;i++){
-        for(int j=0;j<individ_size;j++){
-            base.push_back(j);
-            order[j]=rand()%individ_size;
-        }
-        for(int j=0;j<individ_size;j++){
-            pos=rand()%base.size();
-            order[j]=base[pos];
-            base.erase(base.begin()+pos);
-        }
-        result.push_back(std::make_shared<individual<unsigned int>>(order,func));
-    }
-    return result;
-}
+
 
 int main(int argc, char** argv)
 {
-    std::vector<unsigned int> task_times;
-    std::vector<unsigned int> penalties;
-    std::vector<unsigned int> directives;
-    fin.open(argv[1]);
-    fout.open(argv[2]);
+    std::string data_path = argv[1];
+    std::string output_path = argv[2];
+    fout.open(output_path);
     unsigned int data_size = std::atoi(argv[3]);
 
     unsigned int task_time;
@@ -43,7 +22,7 @@ int main(int argc, char** argv)
         return value_to_compare<value_to_compare_with;
     };
 
-    std::vector<unsigned int> positions{data_size/4, data_size/2};
+    std::vector<unsigned int> positions{data_size/4, data_size/2 + data_size/4};
     
     std::vector<selection_strategy<unsigned int,decltype(decider)>*> selection_strategies;
     std::vector<mutation<unsigned int>*> mutation_strategies;
@@ -67,36 +46,10 @@ int main(int argc, char** argv)
 
     std::vector<task> tasks;
 
-    std::vector<std::vector<std::vector<unsigned int>>> tasks_data;
-    // while(!fin.eof())
-    unsigned int data_sets_count = 0;
-    while(!fin.eof())
-    {
-        tasks_data.push_back(std::vector<std::vector<unsigned int>>());
-        tasks_data.back().push_back(std::vector<unsigned int>());
-        for(std::size_t i = 0; i < data_size; ++i)
-        {
-            fin >> task_time;
-            tasks_data.back().back().push_back(task_time);
-        }
-        tasks_data.back().push_back(std::vector<unsigned int>());
-        for(std::size_t i = 0; i < data_size; ++i)
-        {
-            fin >> penalty;
-            tasks_data.back().back().push_back(penalty);
-        }
-        tasks_data.back().push_back(std::vector<unsigned int>());
-        for(std::size_t i = 0; i < data_size; ++i)
-        {
-            fin >> directive;
-            tasks_data.back().back().push_back(directive);
-        }
-        data_sets_count++;
-    }
-
-    unsigned int task_data_id = 2;
+    //Load tasksets
+    std::vector<std::vector<std::vector<unsigned int>>> tasks_data = load_tasks(fin, )
     
-    for(unsigned int j = 0; j < data_sets_count; j++)
+    for(unsigned int j = 0; j < tasks_data.size(); j++)
     {
         for(std::size_t i = 0; i < data_size; ++i)
         {

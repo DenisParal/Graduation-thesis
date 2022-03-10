@@ -17,3 +17,12 @@ endfunction(build_src)
 
 add_executable(evo src/evo.cpp)
 target_include_directories(evo PUBLIC ${INCLUDE_DIR} ${EVO_HEADERS})
+
+add_executable(tournament src/tournament_test.cpp)
+target_include_directories(tournament PUBLIC ${INCLUDE_DIR} ${EVO_HEADERS})
+
+add_executable(correctness src/correctness_check.cpp)
+target_include_directories(correctness PUBLIC ${INCLUDE_DIR} ${EVO_HEADERS})
+
+add_executable(single src/single_run.cpp)
+target_include_directories(single PUBLIC ${INCLUDE_DIR} ${EVO_HEADERS})
