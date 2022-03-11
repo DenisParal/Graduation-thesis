@@ -5,7 +5,7 @@ std::ifstream fin;
 int main()
 {
     fin.open("/home/dparanic/Study/Graduation-thesis/datasets/40_tasks.txt");
-    unsigned int data_size = 6;
+    unsigned int data_size = 40;
 
     std::vector<std::vector<std::vector<unsigned int>>> tasks_data = load_tasks(fin, data_size);
     std::vector<task> tasks;
@@ -21,4 +21,7 @@ int main()
     auto p1 = penalty_calculator{tasks}(order);
     auto p2 = calculate_penalty(tasks, order);
     std::cout << p1 << " " << p2 << "\n";
+
+    individual<unsigned int> ind{order, penalty_calculator{tasks}};
+    std::cout << ind.adapt() << "\n";
 }

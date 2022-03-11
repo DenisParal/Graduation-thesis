@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     std::vector<std::vector<std::shared_ptr<individual<unsigned int>>>> medians;
     std::vector<task> tasks;
 
-    for(unsigned int i = 0; i < 6; i++)
+    for(unsigned int i = 0; i < tasks_data.size(); i++)
     {
         medians.push_back(std::vector<std::shared_ptr<individual<unsigned int>>>());
         for(unsigned int j = 0; j < 2; j++)
@@ -57,6 +57,8 @@ int main(int argc, char** argv)
             std::shared_ptr<individual<unsigned int>> res = evo(pool, calc, decider, 30);
 
             medians[i].push_back(res);
+
+            tasks.clear();
         }
     }
 
@@ -76,10 +78,10 @@ int main(int argc, char** argv)
             {
                 variance[j].push_back((float)(medians[i][j]->adapt())/(float)check);
             }
-            fout << (float)check << " " << (float)(medians[i][j]->adapt()) << " " << variance[j].back() << " [\n";
+            fout << (float)check << " " << (float)(medians[i][j]->adapt()) << " " << variance[j].back() << " [";
             for(auto x : *(medians[i][j]))
             {
-                fout << x << " ";
+                fout << x << ", ";
             }
             fout << "]\n";
         }
