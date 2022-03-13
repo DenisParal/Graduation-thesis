@@ -95,7 +95,8 @@ public:
 template<typename T, typename Adapt_func>
 class npoint_ordered_crossover : public crossover<T,Adapt_func>{
 public:
-    npoint_ordered_crossover(std::vector<unsigned int>& positions):positions(positions){}
+    npoint_ordered_crossover(std::vector<unsigned int>& positions):positions(positions), point_count(positions.size()), positions_initialized(true){}
+    npoint_ordered_crossover(std::size_t point_count):point_count(point_count), positions_initialized(false){}
     std::vector<std::shared_ptr<individual<T>>> operator()(const std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<T>>>& parents, const Adapt_func& func, std::size_t offspring_size=2){
         std::vector<unsigned int> first_parent_order=order_code(*(parents.first));
         std::vector<unsigned int> second_parent_order=order_code(*(parents.second));
@@ -105,6 +106,17 @@ public:
         bool changed=false;
         std::vector<T> fgenotype(size);
         std::vector<T> sgenotype(size);
+
+        if(!positions_initialized)
+        {
+            positions.clear();
+            unsigned int last_point = 0;
+            for(std::size_t i = 0; i < point_count; ++i)
+            {
+                last_point = rand()%(size - last_point) + last_point;
+                positions.push_back(last_point);
+            }
+        }
         for(std::size_t i=0;i<size;i++){
             if(i==positions[index]&&index<positions.size()){
                 changed=!changed;
@@ -122,6 +134,8 @@ public:
         offspring.push_back(std::make_shared<individual<T>>(order_decode(*(parents.second),sgenotype),func));
         return offspring;
     }
+    std::size_t point_count;
+    bool positions_initialized;
     std::vector<unsigned int> positions;
 };
 

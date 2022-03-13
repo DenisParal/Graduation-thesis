@@ -149,12 +149,12 @@ std::vector<std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<
     std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<T>>> candidate;
     std::size_t pos;
     while(population.size()>1){
-        pos = rand()%population.size()
+        pos = rand()%population.size();
         candidate.first = population[pos];
         population.erase(population.begin()+pos);
         for(int i=0;i<population.size();i++){
-            auto max_adapt = std::max(candidate.first->adapt(), population[i]->adapt());
-            auto min_adapt = std::min(candidate.first->adapt(), population[i]->adapt());
+            T max_adapt = std::max(candidate.first->adapt(), population[i]->adapt());
+            T min_adapt = std::min(candidate.first->adapt(), population[i]->adapt());
             float chance;
             if(max_adapt == 0)
             {
@@ -170,7 +170,7 @@ std::vector<std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<
                 break;
             }
         }
-        if(candidate.second() == nullptr)
+        if(candidate.second == nullptr)
         {
             candidate.second = population[rand()%population.size()];
         }
@@ -189,7 +189,7 @@ std::vector<std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<
     std::pair<std::shared_ptr<individual<T>>,std::shared_ptr<individual<T>>> candidate;
     std::size_t pos;
     while(population.size()>1){
-        pos = rand()%population.size()
+        pos = rand()%population.size();
         candidate.first = population[pos];
         population.erase(population.begin()+pos);
         for(int i=0;i<population.size();i++){
