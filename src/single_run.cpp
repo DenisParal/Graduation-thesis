@@ -31,7 +31,7 @@ int main()
                                     reproductive_strategy<unsigned int>,
                                     selection_strategy<unsigned int,decltype(decider)>,
                                     end_condition<unsigned int>
-                                   >evo(new npoint_ordered_crossover<unsigned int, decltype(calc)>(positions),
+                                   >evo(new npoint_ordered_crossover<unsigned int, decltype(calc)>(2),
                                         new saltation_mut<unsigned int>(),//new point_ordered_mut<unsigned int>(),
                                         new positive_assotiative_reproductive_sterategy<unsigned int>(),
                                         new beta_tournament<unsigned int,decltype(decider)>(5),

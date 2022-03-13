@@ -7,11 +7,19 @@ std::ifstream fin;
 std::ofstream fout;
 int main(int argc, char** argv)
 {
-    std::string data_path = argv[1];
-    std::string output_path = argv[2];
+    std::string data_path = "/home/dparanic/Study/Graduation-thesis/datasets/40_tasks.txt";
+    std::string output_path = "/home/dparanic/Study/Graduation-thesis/datasets/40_tasks_res.txt";
+    std::string res_check_path = "/home/dparanic/Study/Graduation-thesis/datasets/40_tasks_check.txt";
+    unsigned int data_size = 40;
+    if(argc > 1)
+    {
+    data_size = std::atoi(argv[1]);
+    data_path = argv[2];
+    output_path = argv[3];
+    res_check_path = argv[4];
+    }
     fin.open(data_path);
     fout.open(output_path);
-    unsigned int data_size = std::atoi(argv[3]);
 
     auto decider=[](unsigned int value_to_compare, unsigned int value_to_compare_with){
         return value_to_compare<value_to_compare_with;
@@ -23,7 +31,7 @@ int main(int argc, char** argv)
     std::vector<reproductive_strategy<unsigned int>*> reproductive_strategies;
     reproductive_strategies.push_back(new positive_assotiative_reproductive_sterategy<unsigned int>());
     reproductive_strategies.push_back(new negative_assotiative_reproductive_sterategy<unsigned int>());
-    reproductive_strategies.push_back(new ordered_inbreeding_reproductive_strategy<unsigned int>(8));
+    reproductive_strategies.push_back(new roulette_reproductive_strategy<unsigned int>());
 
     std::vector<std::vector<std::vector<unsigned int>>> tasks_data = load_tasks(fin, data_size);
 
@@ -33,7 +41,8 @@ int main(int argc, char** argv)
     for(unsigned int i = 0; i < tasks_data.size(); i++)
     {
         medians.push_back(std::vector<std::shared_ptr<individual<unsigned int>>>());
-        for(unsigned int j = 0; j < 2; j++)
+        std::cout << "Progressing task set " << i <<"...\n";
+        for(unsigned int j = 0; j < reproductive_strategies.size(); j++)
         {
             for(std::size_t k = 0; k < data_size; ++k)
             {
@@ -47,7 +56,7 @@ int main(int argc, char** argv)
                                     reproductive_strategy<unsigned int>,
                                     selection_strategy<unsigned int,decltype(decider)>,
                                     end_condition<unsigned int>
-                                   >evo(new npoint_ordered_crossover<unsigned int, decltype(calc)>(positions),
+                                   >evo(new npoint_ordered_crossover<unsigned int, decltype(calc)>(2),
                                         new saltation_mut<unsigned int>(),//new point_ordered_mut<unsigned int>(),
                                         reproductive_strategies[j],
                                         new beta_tournament<unsigned int,decltype(decider)>(5),
@@ -60,23 +69,26 @@ int main(int argc, char** argv)
 
             tasks.clear();
         }
+        std::cout << "Completed...\n";
     }
 
     fin.close();
-    fin.open("/home/dparanic/Study/Graduation-thesis/datasets/40_tasks_check.txt");
-    std::vector<std::vector<float>> variance(2,std::vector<float>());
+    std::cout << "Opening check file...\n";
+    fin.open(res_check_path);
+    std::cout << "Opened...\n";
+    std::vector<std::vector<float>> variance(reproductive_strategies.size(),std::vector<float>());
     unsigned int check;
     for(unsigned int i = 0; i < medians.size(); ++i)
     {
         fin >> check;
-        for(unsigned int j = 0; j < 2; ++j)
+        for(unsigned int j = 0; j < reproductive_strategies.size(); ++j)
         {
-            if(check == 0)
+            if(medians[i][j]->adapt() == 0)
             {
-                variance[j].push_back((float)(medians[i][j]->adapt()));
+                variance[j].push_back((float)(check));
             }else
             {
-                variance[j].push_back((float)(medians[i][j]->adapt())/(float)check);
+                variance[j].push_back(((float)(medians[i][j]->adapt()) - (float)(check))/(float)(medians[i][j]->adapt()));
             }
             fout << (float)check << " " << (float)(medians[i][j]->adapt()) << " " << variance[j].back() << " [";
             for(auto x : *(medians[i][j]))
@@ -86,8 +98,11 @@ int main(int argc, char** argv)
             fout << "]\n";
         }
     }
-    // float var1 = std::reduce(variance[0].begin(), variance[0].end(), 0.0f);
-    // float var2 = std::reduce(variance[1].begin(), variance[1].end(), 0.0f);
 
-    // std::cout << var1/(float)variance[0].size()<< " " << var2/(float)variance[0].size() << "\n";
+    for(unsigned int i = 0; i < reproductive_strategies.size(); ++i)
+    {
+        float var = std::accumulate(variance[i].begin(), variance[i].end(), 0.0f);
+        std::cout << var/(float)variance[i].size()<< " ";
+    }
+    std::cout << std::endl;
 }
