@@ -4,10 +4,17 @@
 #include <cmath>
 #include <fstream>
 #include "Genetic.h"
+#include <string>
 
 
 bool enable_log = false;
+bool file_output = false;
+std::fstream file_log_output;
 
+void init_file_output(std::string path)
+{
+    file_log_output.open(path);
+}
 template<typename... T>
 void log(T... message)
 {
@@ -19,7 +26,14 @@ void log(T&& message, Other... other)
 {
     if(enable_log)
     {
-        std::cout << message;
+        if(!file_output)
+        {
+            std::cout << message;
+        }
+        else if(file_log_output.is_open())
+        {
+            file_log_output << message;
+        }
         log(other...);
     }
 }

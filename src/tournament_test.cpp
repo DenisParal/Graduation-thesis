@@ -7,9 +7,9 @@ std::ifstream fin;
 std::ofstream fout;
 int main(int argc, char** argv)
 {
-    std::string data_path = "/home/dparanic/Study/Graduation-thesis/datasets/40_tasks.txt";
-    std::string output_path = "/home/dparanic/Study/Graduation-thesis/datasets/40_tasks_res.txt";
-    std::string res_check_path = "/home/dparanic/Study/Graduation-thesis/datasets/40_tasks_check.txt";
+    std::string data_path = "/home/denis/work/Graduation-thesis/datasets/40_tasks.txt";
+    std::string output_path = "/home/denis/work/Graduation-thesis/datasets/40_tasks_res.txt";
+    std::string res_check_path = "/home/denis/work/Graduation-thesis/datasets/40_tasks_check.txt";
     unsigned int data_size = 40;
     if(argc > 1)
     {
@@ -30,8 +30,8 @@ int main(int argc, char** argv)
 
     std::vector<reproductive_strategy<unsigned int>*> reproductive_strategies;
     reproductive_strategies.push_back(new positive_assotiative_reproductive_sterategy<unsigned int>());
-    reproductive_strategies.push_back(new negative_assotiative_reproductive_sterategy<unsigned int>());
-    reproductive_strategies.push_back(new roulette_reproductive_strategy<unsigned int>());
+    // reproductive_strategies.push_back(new negative_assotiative_reproductive_sterategy<unsigned int>());
+    // reproductive_strategies.push_back(new roulette_reproductive_strategy<unsigned int>());
 
     std::vector<std::vector<std::vector<unsigned int>>> tasks_data = load_tasks(fin, data_size);
 
@@ -56,13 +56,13 @@ int main(int argc, char** argv)
                                     reproductive_strategy<unsigned int>,
                                     selection_strategy<unsigned int,decltype(decider)>,
                                     end_condition<unsigned int>
-                                   >evo(new npoint_ordered_crossover<unsigned int, decltype(calc)>(2),
+                                   >evo(new classic_crossover<unsigned int, decltype(calc)>(),
                                         new saltation_mut<unsigned int>(),//new point_ordered_mut<unsigned int>(),
                                         reproductive_strategies[j],
                                         new beta_tournament<unsigned int,decltype(decider)>(5),
-                                        new min_adaptation_cond<unsigned int>(50)
+                                        new min_adaptation_cond<unsigned int>(data_size)
                                        );
-            auto pool=generate_random_population(data_size,50,calc);
+            auto pool=generate_random_population(data_size,data_size,calc);
             std::shared_ptr<individual<unsigned int>> res = evo(pool, calc, decider, 30);
 
             medians[i].push_back(res);
@@ -83,24 +83,28 @@ int main(int argc, char** argv)
         fin >> check;
         for(unsigned int j = 0; j < reproductive_strategies.size(); ++j)
         {
-            if(medians[i][j]->adapt() == 0)
+            if(check == 0)
             {
-                variance[j].push_back((float)(check));
+                variance[j].push_back((float)(medians[i][j]->adapt()));
             }else
             {
-                variance[j].push_back(((float)(medians[i][j]->adapt()) - (float)(check))/(float)(medians[i][j]->adapt()));
+                variance[j].push_back(((float)(medians[i][j]->adapt()) - (float)(check))/(float)(check));
             }
-            fout << (float)check << " " << (float)(medians[i][j]->adapt()) << " " << variance[j].back() << " [";
-            for(auto x : *(medians[i][j]))
-            {
-                fout << x << ", ";
-            }
-            fout << "]\n";
+            fout << (float)check << "," << (float)(medians[i][j]->adapt()) << "," << variance[j].back() <<";\n";
+            // fout << " [";
+            // for(auto x : *(medians[i][j]))
+            // {
+            //     fout << x << ", ";
+            // }
+            // fout << "]\n";
         }
     }
 
     for(unsigned int i = 0; i < reproductive_strategies.size(); ++i)
     {
+        std::sort(variance[i].begin(),variance[i].end());
+        variance[i].erase(variance[i].begin(),variance[i].begin()+variance[i].size()/10);
+        variance[i].erase(variance[i].end()-variance[i].size()/10, variance[i].end());
         float var = std::accumulate(variance[i].begin(), variance[i].end(), 0.0f);
         std::cout << var/(float)variance[i].size()<< " ";
     }

@@ -1,13 +1,12 @@
 #include "genetic_algorithm.hpp"
 #include "core.hpp"
+#include <cmath>
 
 std::ifstream fin;
 int main()
 {
-    fin.open("/home/dparanic/Study/Graduation-thesis/datasets/40_tasks.txt");
+    fin.open("/home/denis/work/Graduation-thesis/datasets/40_tasks.txt");
     unsigned int data_size = 40;
-
-
 
     std::vector<std::vector<std::vector<unsigned int>>> tasks_data = load_tasks(fin, data_size);
     std::vector<task> tasks;
@@ -26,6 +25,10 @@ int main()
 
     penalty_calculator calc{tasks};
 
+    enable_log = true;
+    file_output = true;
+    init_file_output("/home/denis/work/Graduation-thesis/build/output_example.txt");
+
     algorithm_configuration<crossover<unsigned int, decltype(calc)>,
                                     mutation<unsigned int>,
                                     reproductive_strategy<unsigned int>,
@@ -35,9 +38,9 @@ int main()
                                         new saltation_mut<unsigned int>(),
                                         new positive_assotiative_reproductive_sterategy<unsigned int>(),
                                         new beta_tournament<unsigned int,decltype(decider)>(5),
-                                        new min_adaptation_cond<unsigned int>(50)
+                                        new min_adaptation_cond<unsigned int>(data_size)
                                        );
-    auto pool=generate_random_population(data_size,50,calc);
+    auto pool=generate_random_population(data_size,200,calc);
     std::shared_ptr<individual<unsigned int>> res = evo(pool, calc, decider, 30);
 
     std::cout << res->adapt() << " [";
